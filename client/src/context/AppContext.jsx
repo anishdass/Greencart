@@ -16,9 +16,8 @@ export const AppContextProvider = ({ children }) => {
   const currency = import.meta.VITE_CURRENCY;
 
   // Add product to cart
-  const addToCart = () => {
+  const addToCart = (itemId) => {
     let cartData = structuredClone(cartItems);
-
     if (cartData[itemId]) {
       cartData[itemId] += 1;
     } else {
@@ -26,14 +25,6 @@ export const AppContextProvider = ({ children }) => {
     }
     setCartItems(cartData);
     toast.success("Added to cart");
-  };
-
-  // Update cart items
-  const updateCartItem = (itemId, quantity) => {
-    let cartData = structuredClone(cartItems);
-    cartData[itemId] = quantity;
-    setCartItems(cartData);
-    toast.success("Cart Updated");
   };
 
   // Remove products from cart
@@ -44,8 +35,17 @@ export const AppContextProvider = ({ children }) => {
       if (cartData[itemId] === 0) {
         delete cartData[itemId];
       }
+      setCartItems(cartData);
       toast.success("Removed from cart");
     }
+  };
+
+  // Update cart items
+  const updateCartItem = (itemId, quantity) => {
+    let cartData = structuredClone(cartItems);
+    cartData[itemId] = quantity;
+    setCartItems(cartData);
+    toast.success("Cart Updated");
   };
 
   // Fetch All Products
