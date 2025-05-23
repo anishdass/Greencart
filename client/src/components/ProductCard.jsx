@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 
 const ProductCard = ({ product }) => {
-  const [count, setCount] = useState(0);
   const {
     currency,
     addToCart,
