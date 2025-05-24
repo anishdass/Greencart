@@ -5,11 +5,9 @@ import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const [open, setOpen] = React.useState(false);
-  const { user, setUser, showUserLogin, setShowUserLogin, navigate } =
-    useContext(AppContext);
+  const { user, setShowUserLogin, navigate } = useContext(AppContext);
 
   const logout = async () => {
-    setUser(null);
     navigate("/");
   };
   return (
@@ -48,7 +46,7 @@ const Navbar = () => {
 
         {!user ? (
           <button
-            onClick={() => setUser(true)}
+            onClick={() => setShowUserLogin(true)}
             className='cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition text-white rounded-full'>
             Login
           </button>
