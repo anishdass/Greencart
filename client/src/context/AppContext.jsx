@@ -9,9 +9,11 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isSeller, setIsSeller] = useState(false);
-  const [showUserLogin, setShowUserLogin] = useState(false);
+  const [loginAttempt, setLoginAttempt] = useState(false);
   const [products, setProducts] = useState([]);
+
   const [cartItems, setCartItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState([]);
 
   const currency = import.meta.VITE_CURRENCY;
 
@@ -63,14 +65,16 @@ export const AppContextProvider = ({ children }) => {
     setUser,
     isSeller,
     setIsSeller,
-    showUserLogin,
-    setShowUserLogin,
+    loginAttempt,
+    setLoginAttempt,
     products,
     currency,
     cartItems,
     addToCart,
     updateCartItem,
     removeFromCart,
+    searchQuery,
+    setSearchQuery,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

@@ -7,17 +7,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { setShowUserLogin, setUser } = useAppContext();
+  const { setLoginAttempt, setUser } = useAppContext();
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     setUser({ name: "test", email: "test@test.com" });
-    setShowUserLogin(false);
+    setLoginAttempt(false);
   };
 
   return (
     <div
-      onClick={() => setShowUserLogin(false)}
+      onClick={() => setLoginAttempt(false)}
       className=' fixed top-0 bottom-0 left-0 right-0 z-30 flex items-center text-sm text-gray-600 bg-black/50'>
       <form
         onSubmit={onSubmitHandler}
