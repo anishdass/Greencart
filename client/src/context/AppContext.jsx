@@ -15,7 +15,7 @@ export const AppContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState([]);
 
-  const currency = import.meta.VITE_CURRENCY;
+  const currency = import.meta.env.VITE_CURRENCY;
 
   // Add product to cart
   const addToCart = (itemId) => {
