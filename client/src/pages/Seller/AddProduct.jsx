@@ -26,7 +26,7 @@ const AddProduct = () => {
               .map((_, index) => (
                 <label key={index} htmlFor={`image${index}`}>
                   <input
-                    onChange={() => {
+                    onChange={(e) => {
                       const updateFiles = [...files];
                       updateFiles[index] = e.target.files[0];
                       setFiles(updateFiles);
