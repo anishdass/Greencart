@@ -2,6 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 export const AppContext = createContext();
 
@@ -50,6 +54,21 @@ export const AppContextProvider = ({ children }) => {
     toast.success("Cart Updated");
   };
 
+  // Fetch Seller Status
+  const fetchSeller = async () => {
+    try {
+      const { data } = await axios.get("/api/seller/is-auth");
+      console.log(data);
+      if (data.success) {
+        setIsSeller(true);
+      } else {
+        setIsSeller(false);
+      }
+    } catch {
+      setIsSeller(false);
+    }
+  };
+
   // Fetch All Products
   const fetchProducts = async () => {
     setProducts(dummyProducts);
@@ -77,6 +96,7 @@ export const AppContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    fetchSeller();
     fetchProducts();
   }, []);
 
@@ -98,6 +118,7 @@ export const AppContextProvider = ({ children }) => {
     setSearchQuery,
     getCartAmount,
     getCartCount,
+    axios,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

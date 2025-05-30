@@ -12,7 +12,7 @@ export const sellerLogin = async (req, res) => {
         expiresIn: "7d",
       });
 
-      res.cookie("sellerToke", token, {
+      res.cookie("sellerToken", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
