@@ -58,7 +58,6 @@ export const AppContextProvider = ({ children }) => {
   const fetchSeller = async () => {
     try {
       const { data } = await axios.get("/api/seller/is-auth");
-      console.log(data);
       if (data.success) {
         setIsSeller(true);
       } else {
@@ -71,7 +70,16 @@ export const AppContextProvider = ({ children }) => {
 
   // Fetch All Products
   const fetchProducts = async () => {
-    setProducts(dummyProducts);
+    try {
+      const { data } = await axios.get("/api/product/list");
+      if (data.success) {
+        setProducts(data.products);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   // Get cart item count
@@ -119,6 +127,7 @@ export const AppContextProvider = ({ children }) => {
     getCartAmount,
     getCartCount,
     axios,
+    fetchProducts,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
