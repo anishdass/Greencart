@@ -1,7 +1,4 @@
-import { reference } from "@popperjs/core";
 import mongoose from "mongoose";
-import Product from "./Product";
-import { required } from "joi";
 
 const orderSchema = new mongoose.Schema(
   {
