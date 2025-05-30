@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { dummyProducts } from "../assets/assets";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
@@ -116,11 +115,30 @@ export const AppContextProvider = ({ children }) => {
     return Math.floor(totalAmount + 100) / 100;
   };
 
+  const updateCart = async () => {
+    try {
+      console.log(JSON.stringify(cartItems));
+      const { data } = await axios.post("/api/cart/update", { cartItems });
+      if (!data.success) {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     fetchSeller();
     fetchProducts();
     fetchUser();
   }, []);
+
+  // Update cart items in DsB
+  useEffect(() => {
+    if (user) {
+      updateCart();
+    }
+  }, [cartItems]);
 
   const value = {
     isSeller,
