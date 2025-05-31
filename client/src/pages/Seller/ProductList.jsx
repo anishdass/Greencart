@@ -10,6 +10,7 @@ const ProductList = () => {
       const { data } = await axios.post("/api/product/stock", { id, inStock });
       if (data.success) {
         fetchProducts();
+        toast.success("Stock Changed");
       }
     } catch (error) {
       toast.error(error.message);
@@ -56,7 +57,7 @@ const ProductList = () => {
                     <label className='relative inline-flex items-center cursor-pointer gap-3'>
                       <input
                         type='checkbox'
-                        onClick={() =>
+                        onChange={() =>
                           toggleStock(product._id, !product.inStock)
                         }
                         checked={product.inStock}
