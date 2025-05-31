@@ -9,9 +9,10 @@ export const placeOrderCOD = async (req, res) => {
     if (!address || items.length === 0) {
       return res.json({ success: false, message: "Invalid Data" });
     }
+
     // Calculate amount using Items
     let amount = await items.reduce(async (acc, item) => {
-      const product = await Product.findById(item.Product);
+      const product = await Product.findById(item.product);
       return (await acc) + product.offerPrice * item.quantity;
     }, 0);
     // Add tax charged 2%

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { assets, dummyAddress } from "../assets/assets";
+import { assets } from "../assets/assets";
 import toast from "react-hot-toast";
 
 const Cart = () => {
@@ -15,15 +15,42 @@ const Cart = () => {
     getCartAmount,
     axios,
     user,
+    setCartItems,
   } = useAppContext();
 
   const [cartArray, setCartArray] = useState([]);
   const [addresses, setAddresses] = useState();
   const [showAddress, setShowAddress] = useState(false);
-  const [selectAddress, setSelectedAddress] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState("COD");
 
-  const placeOrder = async () => {};
+  const placeOrder = async () => {
+    try {
+      if (!selectedAddress) {
+        return toast.error("Please select an address");
+      }
+      // Place order with COD
+      if (paymentOption === "COD") {
+        const { data } = await axios.post("/api/order/cod", {
+          userId: user._id,
+          items: cartArray.map((item) => ({
+            product: item._id,
+            quantity: item.quantity,
+          })),
+          address: selectedAddress._id,
+        });
+        if (data.success) {
+          toast.success(data.message);
+          setCartItems({});
+          navigate("/my-orders");
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   const getCart = () => {
     let tempArray = [];
@@ -170,8 +197,8 @@ const Cart = () => {
           <p className='text-sm font-medium uppercase'>Delivery Address</p>
           <div className='relative flex justify-between items-start mt-2'>
             <p className='text-gray-500'>
-              {selectAddress
-                ? `${selectAddress.street}, ${selectAddress.city}, ${selectAddress.state}, ${selectAddress.country}`
+              {selectedAddress
+                ? `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}`
                 : "No address found"}
             </p>
             <button
