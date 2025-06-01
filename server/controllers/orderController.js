@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 import Stripe from "stripe";
 
 // Place order using COD: /api/order/cod
@@ -96,8 +97,66 @@ export const placeOrderStripe = async (req, res) => {
   }
 };
 
-// Get Orders by user id: /api/order/user
+// Stripe webhooks to verify payments action: /stripe
+export const stripeWebhooks = async (req, res) => {
+  // Stripe gateway initialization
+  const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+  const sig = req.headers["stripe-signature"];
+  let event;
+  try {
+    event = stripeInstance.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).send(`Webhook Error:${error.message}`);
+  }
+  // Handle the event
+  switch (event.type) {
+    case "payment_intent_succeeded": {
+      const paymentIntent = event.data.object;
+      const paymentIntentId = paymentIntent.id;
+
+      // Getting session metadata
+      const session = await stripeInstance.checkout.sessions.list({
+        payment_intent: paymentIntentId,
+      });
+      const { orderId, userId } = session.data[0].metadata;
+
+      // Mark payment as paid
+      await Order.findByIdAndUpdate(orderId, { isPaid: true });
+      // Clear user cart
+      await User.findByIdAndUpdate(userId, { cartItems: {} });
+      break;
+    }
+
+    case "payment_intent.payment_failed": {
+      const paymentIntent = event.data.object;
+      const paymentIntentId = paymentIntent.id;
+
+      // Getting session metadata
+      const session = await stripeInstance.checkout.sessions.list({
+        payment_intent: paymentIntentId,
+      });
+      const { orderId } = session.data[0].metadata;
+
+      await Order.findByIdAndDelete(orderId);
+
+      break;
+    }
+
+    default:
+      console.error(`Unhandled event type ${event.type}`);
+
+      break;
+  }
+  res.json({ received: true });
+};
+
+// Get Orders by user id: /api/order/user
 export const getUserOrders = async (req, res) => {
   try {
     const { userId } = req.body;
