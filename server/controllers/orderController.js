@@ -1,3 +1,4 @@
+import { request } from "express";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
@@ -37,8 +38,10 @@ export const placeOrderCOD = async (req, res) => {
 export const placeOrderStripe = async (req, res) => {
   try {
     const { userId, items, address } = req.body;
+
     const { origin } = req.headers;
 
+    console.log(origin);
     if (!address || items.length === 0) {
       return res.json({ success: false, message: "Invalid Data" });
     }
@@ -103,20 +106,19 @@ export const stripeWebhooks = async (req, res) => {
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const sig = req.headers["stripe-signature"];
-  let event;
   try {
-    event = stripeInstance.webhooks.constructEvent(
+    let event = stripeInstance.webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (error) {
     console.error(error.message);
-    res.status(400).send(`Webhook Error:${error.message}`);
+    return res.status(400).send(`Webhook Error:${error.message}`);
   }
   // Handle the event
   switch (event.type) {
-    case "payment_intent_succeeded": {
+    case "payment_intent.succeeded": {
       const paymentIntent = event.data.object;
       const paymentIntentId = paymentIntent.id;
 
@@ -142,9 +144,7 @@ export const stripeWebhooks = async (req, res) => {
         payment_intent: paymentIntentId,
       });
       const { orderId } = session.data[0].metadata;
-
       await Order.findByIdAndDelete(orderId);
-
       break;
     }
 
@@ -162,7 +162,6 @@ export const getUserOrders = async (req, res) => {
     const { userId } = req.body;
     const orders = await Order.find({
       userId,
-      $or: [{ paymentType: "COD" }, { isPaid: true }],
     })
       .populate("items.product address")
       .sort({ createdAt: -1 });
